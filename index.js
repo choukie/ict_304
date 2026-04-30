@@ -536,8 +536,7 @@ app.get('/health', (req, res) => {
 });
 
 // ─── PAGE DE DOCUMENTATION ───────────────────────────────────────────
-app.get('/api-docs', (req, res) => res.redirect('/api-docs/'));
-app.get('/api-docs/', (req, res) => {
+app.get(['/api-docs', '/api-docs/'], (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="fr">
 <head>

@@ -1,22 +1,23 @@
 {
-  "name": "banking-api",
-  "version": "1.0.0",
-  "description": "",
+  "name": "banking-api-v2",
+  "version": "2.0.0",
+  "description": "ICT304 — API Bancaire Multibanque (Node.js + Express)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "node index.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["banking", "api", "express", "ict304"],
+  "author": "NGANFANG KENGNI IDE MERVEILLE - 22V2344",
   "license": "ISC",
-  "dependencies": {
-    "express": "^5.2.1",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1",
-    "uuid": "^14.0.0"
-  },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^14.0.0"
   }
 }

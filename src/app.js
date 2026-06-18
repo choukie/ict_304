@@ -2,6 +2,7 @@
 //  APP — Configuration Express
 // ══════════════════════════════════════════════════════════════════
 
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
@@ -16,6 +17,11 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// ─── INTERFACE UTILISATEUR ────────────────────────────────────────
+app.get(['/app', '/app/'], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'app.html'));
+});
 
 // ─── DOCUMENTATION ────────────────────────────────────────────────
 app.use(

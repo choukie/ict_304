@@ -5,9 +5,19 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "node index.js"
+    "dev": "node index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration"
   },
-  "keywords": ["banking", "api", "express", "ict304"],
+  "keywords": [
+    "banking",
+    "api",
+    "express",
+    "ict304"
+  ],
   "author": "NGANFANG KENGNI IDE MERVEILLE - 22V2344",
   "license": "ISC",
   "engines": {
@@ -19,5 +29,10 @@
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^14.0.0"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.9",
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.9"
   }
 }

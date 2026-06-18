@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mwa Banque — ICT304</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --night: #0d1b2a;
+  --petrol: #15324a;
+  --petrol-light: #1b4965;
+  --sky: #5fa8d3;
+  --sand: #f4a261;
+  --sand-dim: #c97f3f;
+  --teal: #2a9d8f;
+  --rose: #e76f51;
+  --paper: #eef2f5;
+  --paper-dim: #b9c4cc;
+  --line: rgba(255,255,255,0.08);
+  --display: 'Space Grotesk', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --body: 'Inter', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--night);
+  background-image:
+    radial-gradient(circle at 15% 8%, rgba(95,168,211,0.12), transparent 45%),
+    radial-gradient(circle at 90% 85%, rgba(244,162,97,0.08), transparent 50%);
+  color: var(--paper);
+  font-family: var(--body);
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* ── HEADER ── */
+header {
+  padding: 28px 24px 20px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.brand .mark {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+}
+.brand .mark span { color: var(--sand); }
+.brand .tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--sky);
+  letter-spacing: 0.08em;
+  border: 1px solid var(--petrol-light);
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+.student-line {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--paper-dim);
+  margin-top: 6px;
+}
+
+/* ── LAYOUT ── */
+.wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: 380px 1fr; gap: 22px; }
+@media (max-width: 860px) { .wrap { grid-template-columns: 1fr; } }
+
+/* ── LE BILLET (signature) ── */
+.bill-card {
+  background: linear-gradient(155deg, var(--petrol-light), var(--petrol) 60%, var(--night));
+  border-radius: 22px;
+  padding: 26px 24px 22px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+}
+.bill-card::before {
+  content: '';
+  position: absolute;
+  top: -40%; right: -30%;
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(244,162,97,0.18), transparent 70%);
+  border-radius: 50%;
+}
+.bill-card::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px dashed rgba(255,255,255,0.10);
+  border-radius: 16px;
+  pointer-events: none;
+}
+.bill-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px; position: relative; z-index: 1; }
+.bill-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--sky); text-transform: uppercase; }
+.bill-owner { font-family: var(--display); font-size: 15px; font-weight: 600; margin-top: 4px; max-width: 180px; }
+.bill-status {
+  font-family: var(--mono); font-size: 10px; padding: 4px 10px; border-radius: 20px;
+  background: rgba(42,157,143,0.18); color: var(--teal); border: 1px solid rgba(42,157,143,0.4);
+}
+.bill-status.blocked { background: rgba(231,111,81,0.18); color: var(--rose); border-color: rgba(231,111,81,0.4); }
+
+.bill-amount {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(2.4rem, 7vw, 3.1rem);
+  letter-spacing: -0.02em;
+  position: relative; z-index: 1;
+  transition: transform 0.25s ease;
+  display: flex; align-items: baseline; gap: 8px;
+}
+.bill-amount .cur { font-size: 0.45em; color: var(--sand); font-family: var(--mono); font-weight: 500; }
+.bill-amount.pulse { transform: scale(1.04); }
+.bill-amount.up { color: var(--teal); }
+.bill-amount.down { color: var(--rose); }
+
+.bill-bottom { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 22px; position: relative; z-index: 1; }
+.bill-number { font-family: var(--mono); font-size: 12px; color: var(--paper-dim); letter-spacing: 0.05em; }
+.bill-type { font-family: var(--mono); font-size: 11px; color: var(--sky); }
+
+.no-account {
+  text-align: center; padding: 50px 20px;
+  font-family: var(--mono); font-size: 13px; color: var(--paper-dim);
+  display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; z-index: 1;
+}
+.no-account .big { font-size: 32px; }
+
+/* ── SELECT COMPTE ── */
+.account-picker {
+  margin-top: 14px;
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.chip {
+  font-family: var(--mono); font-size: 11px; padding: 7px 12px;
+  background: var(--petrol); border: 1px solid var(--line); border-radius: 20px;
+  color: var(--paper-dim); cursor: pointer; transition: all 0.15s;
+}
+.chip:hover { border-color: var(--sky); color: var(--paper); }
+.chip.active { background: var(--sand); color: var(--night); border-color: var(--sand); font-weight: 600; }
+
+/* ── PANEL DROITE : ACTIONS ── */
+.panel {
+  background: var(--petrol);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 22px;
+}
+.tabs { display: flex; gap: 4px; margin-bottom: 18px; background: var(--night); border-radius: 14px; padding: 4px; }
+.tab-btn {
+  flex: 1; padding: 10px 6px; border: none; background: transparent;
+  color: var(--paper-dim); font-family: var(--body); font-weight: 600; font-size: 12.5px;
+  border-radius: 10px; cursor: pointer; transition: all 0.15s;
+}
+.tab-btn.active { background: var(--petrol-light); color: var(--paper); }
+.tab-btn:hover:not(.active) { color: var(--paper); }
+
+.form-group { margin-bottom: 14px; }
+.form-group label {
+  display: block; font-family: var(--mono); font-size: 11px; color: var(--sky);
+  letter-spacing: 0.04em; margin-bottom: 6px; text-transform: uppercase;
+}
+.form-group input, .form-group select {
+  width: 100%; padding: 12px 14px; background: var(--night);
+  border: 1px solid var(--line); border-radius: 10px; color: var(--paper);
+  font-family: var(--body); font-size: 14px; outline: none; transition: border-color 0.15s;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--sky); }
+.form-group input::placeholder { color: var(--paper-dim); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.btn-primary {
+  width: 100%; padding: 13px; border: none; border-radius: 10px;
+  background: var(--sand); color: var(--night); font-family: var(--body);
+  font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.15s;
+  margin-top: 4px;
+}
+.btn-primary:hover { background: #ffb27a; transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-primary.withdraw { background: var(--rose); }
+.btn-primary.withdraw:hover { background: #ef8569; }
+.btn-primary.transfer { background: var(--sky); }
+.btn-primary.transfer:hover { background: #7cbce0; }
+.btn-primary.danger { background: transparent; border: 1px solid var(--rose); color: var(--rose); }
+.btn-primary.danger:hover { background: rgba(231,111,81,0.1); }
+
+.feedback {
+  margin-top: 12px; padding: 10px 12px; border-radius: 10px;
+  font-family: var(--mono); font-size: 12px; display: none; line-height: 1.5;
+}
+.feedback.show { display: block; }
+.feedback.ok { background: rgba(42,157,143,0.15); color: var(--teal); border: 1px solid rgba(42,157,143,0.3); }
+.feedback.err { background: rgba(231,111,81,0.15); color: var(--rose); border: 1px solid rgba(231,111,81,0.3); }
+
+/* ── HISTORIQUE ── */
+.history {
+  margin-top: 22px;
+  background: var(--petrol);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 22px;
+  grid-column: 1 / -1;
+}
+.history h3 {
+  font-family: var(--display); font-size: 15px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.history h3::before { content: '◷'; color: var(--sand); }
+.tx-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 13px;
+}
+.tx-row:last-child { border-bottom: none; }
+.tx-left { display: flex; align-items: center; gap: 10px; }
+.tx-icon {
+  width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center;
+  justify-content: center; font-family: var(--mono); font-size: 14px; flex-shrink: 0;
+}
+.tx-icon.dep { background: rgba(42,157,143,0.15); color: var(--teal); }
+.tx-icon.wit { background: rgba(231,111,81,0.15); color: var(--rose); }
+.tx-desc { color: var(--paper); font-weight: 500; }
+.tx-date { font-family: var(--mono); font-size: 10.5px; color: var(--paper-dim); margin-top: 2px; }
+.tx-amount { font-family: var(--mono); font-weight: 600; font-size: 13.5px; }
+.tx-amount.dep { color: var(--teal); }
+.tx-amount.wit { color: var(--rose); }
+.empty-history { text-align: center; padding: 24px; color: var(--paper-dim); font-family: var(--mono); font-size: 12px; }
+
+/* ── TOAST ── */
+.toast-wrap { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+.toast {
+  background: var(--petrol-light); border: 1px solid var(--line); border-radius: 12px;
+  padding: 12px 16px; font-family: var(--mono); font-size: 12.5px; max-width: 280px;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); animation: slidein 0.25s ease;
+}
+.toast.ok { border-left: 3px solid var(--teal); }
+.toast.err { border-left: 3px solid var(--rose); }
+@keyframes slidein { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.2); border-top-color: var(--night); border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
+
+footer {
+  max-width: 980px; margin: 30px auto 0; padding: 0 24px;
+  font-family: var(--mono); font-size: 11px; color: var(--paper-dim); text-align: center;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="mark">Mwa<span>Banque</span></span>
+    <span class="tag">ICT304</span>
+  </div>
+  <div class="student-line">NGANFANG KENGNI IDE MERVEILLE — 22V2344</div>
+</header>
+
+<div class="wrap">
+  <!-- COLONNE GAUCHE : LE BILLET -->
+  <div>
+    <div class="bill-card" id="billCard">
+      <div id="billContent">
+        <div class="no-account">
+          <div class="big">🏦</div>
+          <div>Aucun compte sélectionné.<br/>Crée ton premier compte à droite →</div>
+        </div>
+      </div>
+    </div>
+    <div class="account-picker" id="accountPicker"></div>
+  </div>
+
+  <!-- COLONNE DROITE : ACTIONS -->
+  <div class="panel">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="create">Créer</button>
+      <button class="tab-btn" data-tab="deposit">Dépôt</button>
+      <button class="tab-btn" data-tab="withdraw">Retrait</button>
+      <button class="tab-btn" data-tab="transfer">Transfert</button>
+      <button class="tab-btn" data-tab="delete">Suppr.</button>
+    </div>
+
+    <!-- CRÉER -->
+    <div class="tab-content" id="tab-create">
+      <div class="form-group">
+        <label>Nom du titulaire</label>
+        <input type="text" id="c-name" placeholder="Ex : Alice Dupont"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Type</label>
+          <select id="c-type">
+            <option value="CHECKING">Courant</option>
+            <option value="SAVINGS">Épargne</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Devise</label>
+          <select id="c-currency">
+            <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+            <option value="GBP">GBP</option>
+            <option value="CHF">CHF</option>
+            <option value="CAD">CAD</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Solde initial (optionnel)</label>
+        <input type="number" id="c-balance" placeholder="0"/>
+      </div>
+      <button class="btn-primary" id="btn-create">Créer le compte</button>
+      <div class="feedback" id="fb-create"></div>
+    </div>
+
+    <!-- DÉPÔT -->
+    <div class="tab-content" id="tab-deposit" style="display:none">
+      <div class="form-group">
+        <label>Montant à déposer</label>
+        <input type="number" id="d-amount" placeholder="Ex : 5000"/>
+      </div>
+      <div class="form-group">
+        <label>Description (optionnel)</label>
+        <input type="text" id="d-desc" placeholder="Ex : Salaire du mois"/>
+      </div>
+      <button class="btn-primary" id="btn-deposit">Déposer</button>
+      <div class="feedback" id="fb-deposit"></div>
+    </div>
+
+    <!-- RETRAIT -->
+    <div class="tab-content" id="tab-withdraw" style="display:none">
+      <div class="form-group">
+        <label>Montant à retirer</label>
+        <input type="number" id="w-amount" placeholder="Ex : 2000"/>
+      </div>
+      <div class="form-group">
+        <label>Description (optionnel)</label>
+        <input type="text" id="w-desc" placeholder="Ex : Retrait DAB"/>
+      </div>
+      <button class="btn-primary withdraw" id="btn-withdraw">Retirer</button>
+      <div class="feedback" id="fb-withdraw"></div>
+    </div>
+
+    <!-- TRANSFERT -->
+    <div class="tab-content" id="tab-transfer" style="display:none">
+      <div class="form-group">
+        <label>Compte destinataire</label>
+        <select id="t-dest"></select>
+      </div>
+      <div class="form-group">
+        <label>Montant</label>
+        <input type="number" id="t-amount" placeholder="Ex : 1000"/>
+      </div>
+      <button class="btn-primary transfer" id="btn-transfer">Transférer</button>
+      <div class="feedback" id="fb-transfer"></div>
+    </div>
+
+    <!-- SUPPRESSION -->
+    <div class="tab-content" id="tab-delete" style="display:none">
+      <p style="font-size:13px; color:var(--paper-dim); margin-bottom:14px; line-height:1.5;">
+        Le solde du compte doit être à 0 pour pouvoir le supprimer. Retire tous les fonds avant de continuer.
+      </p>
+      <button class="btn-primary danger" id="btn-delete">Supprimer ce compte</button>
+      <div class="feedback" id="fb-delete"></div>
+    </div>
+  </div>
+
+  <!-- HISTORIQUE -->
+  <div class="history">
+    <h3>Historique des opérations</h3>
+    <div id="historyList"><div class="empty-history">Aucune transaction pour l'instant.</div></div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<footer>Banking API v2.0.0 — ict-304-opij.onrender.com</footer>
+
+<script>
+const API_BASE = window.location.origin + '/api/v1';
+let accounts = [];
+let currentAccountId = null;
+let prevBalance = null;
+
+// ── TOAST ──
+function toast(msg, type = 'ok') {
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+function feedback(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = `feedback show ${type}`;
+}
+
+function clearFeedback(id) {
+  document.getElementById(id).className = 'feedback';
+}
+
+// ── TABS ──
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
+  });
+});
+
+// ── API CALLS ──
+async function apiCall(method, path, body) {
+  try {
+    const res = await fetch(API_BASE + path, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = await res.json();
+    return { ok: res.ok, status: res.status, data };
+  } catch (e) {
+    return { ok: false, status: 0, data: { message: 'Impossible de contacter le serveur. Réessaie dans quelques secondes (le serveur gratuit peut être en veille).' } };
+  }
+}
+
+async function loadAccounts() {
+  const result = await apiCall('GET', '/accounts?limit=100');
+  if (result.ok) {
+    accounts = result.data.data.accounts;
+    renderPicker();
+    renderTransferOptions();
+    if (currentAccountId && !accounts.find(a => a.id === currentAccountId)) {
+      currentAccountId = accounts[0]?.id || null;
+    }
+    if (!currentAccountId && accounts.length > 0) currentAccountId = accounts[0].id;
+    renderBill();
+    if (currentAccountId) loadHistory(currentAccountId);
+  }
+}
+
+function renderPicker() {
+  const picker = document.getElementById('accountPicker');
+  if (accounts.length === 0) { picker.innerHTML = ''; return; }
+  picker.innerHTML = accounts.map(a => `
+    <div class="chip ${a.id === currentAccountId ? 'active' : ''}" data-id="${a.id}">
+      ${a.ownerName.split(' ')[0]} · ${a.accountNumber.slice(-4)}
+    </div>
+  `).join('');
+  picker.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      currentAccountId = chip.dataset.id;
+      prevBalance = null;
+      renderPicker();
+      renderBill();
+      loadHistory(currentAccountId);
+    });
+  });
+}
+
+function renderTransferOptions() {
+  const sel = document.getElementById('t-dest');
+  const others = accounts.filter(a => a.id !== currentAccountId);
+  if (others.length === 0) {
+    sel.innerHTML = '<option value="">Aucun autre compte disponible</option>';
+    return;
+  }
+  sel.innerHTML = others.map(a => `<option value="${a.id}">${a.ownerName} — ${a.accountNumber}</option>`).join('');
+}
+
+function fmtMoney(n) {
+  return new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+}
+
+function renderBill() {
+  const content = document.getElementById('billContent');
+  const account = accounts.find(a => a.id === currentAccountId);
+
+  if (!account) {
+    content.innerHTML = `
+      <div class="no-account">
+        <div class="big">🏦</div>
+        <div>Aucun compte sélectionné.<br/>Crée ton premier compte à droite →</div>
+      </div>`;
+    return;
+  }
+
+  let pulseClass = '';
+  if (prevBalance !== null && prevBalance !== account.balance) {
+    pulseClass = account.balance > prevBalance ? 'pulse up' : 'pulse down';
+  }
+  prevBalance = account.balance;
+
+  content.innerHTML = `
+    <div class="bill-top">
+      <div>
+        <div class="bill-label">Titulaire</div>
+        <div class="bill-owner">${account.ownerName}</div>
+      </div>
+      <div class="bill-status ${account.status !== 'ACTIVE' ? 'blocked' : ''}">${account.status}</div>
+    </div>
+    <div class="bill-amount ${pulseClass}" id="billAmountEl">
+      <span class="cur">${account.currency}</span>${fmtMoney(account.balance)}
+    </div>
+    <div class="bill-bottom">
+      <div class="bill-number">${account.accountNumber}</div>
+      <div class="bill-type">${account.type === 'CHECKING' ? 'Compte courant' : 'Compte épargne'}</div>
+    </div>
+  `;
+  renderTransferOptions();
+
+  setTimeout(() => {
+    const el = document.getElementById('billAmountEl');
+    if (el) el.className = el.className.replace('pulse up', '').replace('pulse down', '').trim();
+  }, 600);
+}
+
+async function loadHistory(accountId) {
+  const result = await apiCall('GET', `/accounts/${accountId}/transactions`);
+  const list = document.getElementById('historyList');
+  if (!result.ok || result.data.data.transactions.length === 0) {
+    list.innerHTML = '<div class="empty-history">Aucune transaction pour l\\'instant.</div>';
+    return;
+  }
+  list.innerHTML = result.data.data.transactions.map(tx => {
+    const isDep = tx.type === 'DEPOSIT';
+    const date = new Date(tx.createdAt).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    return `
+      <div class="tx-row">
+        <div class="tx-left">
+          <div class="tx-icon ${isDep ? 'dep' : 'wit'}">${isDep ? '↓' : '↑'}</div>
+          <div>
+            <div class="tx-desc">${tx.description}</div>
+            <div class="tx-date">${date}</div>
+          </div>
+        </div>
+        <div class="tx-amount ${isDep ? 'dep' : 'wit'}">${isDep ? '+' : '-'}${fmtMoney(tx.amount)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── CRÉER UN COMPTE ──
+document.getElementById('btn-create').addEventListener('click', async () => {
+  clearFeedback('fb-create');
+  const ownerName = document.getElementById('c-name').value.trim();
+  const type = document.getElementById('c-type').value;
+  const currency = document.getElementById('c-currency').value;
+  const initialBalance = parseFloat(document.getElementById('c-balance').value) || 0;
+
+  if (ownerName.length < 2) {
+    feedback('fb-create', 'Le nom doit contenir au moins 2 caractères.', 'err');
+    return;
+  }
+
+  const btn = document.getElementById('btn-create');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Création...';
+
+  const result = await apiCall('POST', '/accounts', { ownerName, type, currency, initialBalance });
+
+  btn.disabled = false;
+  btn.textContent = 'Créer le compte';
+
+  if (result.ok) {
+    feedback('fb-create', `Compte créé : ${result.data.data.accountNumber}`, 'ok');
+    toast(`✅ Compte de ${ownerName} créé avec succès`, 'ok');
+    document.getElementById('c-name').value = '';
+    document.getElementById('c-balance').value = '';
+    currentAccountId = result.data.data.id;
+    prevBalance = null;
+    await loadAccounts();
+  } else {
+    const msg = result.data.errors ? result.data.errors.join(' · ') : result.data.message;
+    feedback('fb-create', msg, 'err');
+  }
+});
+
+// ── DÉPÔT ──
+document.getElementById('btn-deposit').addEventListener('click', async () => {
+  clearFeedback('fb-deposit');
+  if (!currentAccountId) { feedback('fb-deposit', 'Sélectionne un compte d\\'abord.', 'err'); return; }
+
+  const amount = parseFloat(document.getElementById('d-amount').value);
+  const description = document.getElementById('d-desc').value.trim();
+
+  const btn = document.getElementById('btn-deposit');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Dépôt...';
+
+  const result = await apiCall('POST', `/accounts/${currentAccountId}/deposit`, { amount, description: description || undefined });
+
+  btn.disabled = false;
+  btn.textContent = 'Déposer';
+
+  if (result.ok) {
+    feedback('fb-deposit', `Nouveau solde : ${fmtMoney(result.data.data.account.balance)} ${result.data.data.account.currency}`, 'ok');
+    toast(`💰 Dépôt de ${fmtMoney(amount)} effectué`, 'ok');
+    document.getElementById('d-amount').value = '';
+    document.getElementById('d-desc').value = '';
+    await loadAccounts();
+  } else {
+    feedback('fb-deposit', result.data.message, 'err');
+  }
+});
+
+// ── RETRAIT ──
+document.getElementById('btn-withdraw').addEventListener('click', async () => {
+  clearFeedback('fb-withdraw');
+  if (!currentAccountId) { feedback('fb-withdraw', 'Sélectionne un compte d\\'abord.', 'err'); return; }
+
+  const amount = parseFloat(document.getElementById('w-amount').value);
+  const description = document.getElementById('w-desc').value.trim();
+
+  const btn = document.getElementById('btn-withdraw');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Retrait...';
+
+  const result = await apiCall('POST', `/accounts/${currentAccountId}/withdraw`, { amount, description: description || undefined });
+
+  btn.disabled = false;
+  btn.textContent = 'Retirer';
+
+  if (result.ok) {
+    feedback('fb-withdraw', `Nouveau solde : ${fmtMoney(result.data.data.account.balance)} ${result.data.data.account.currency}`, 'ok');
+    toast(`💸 Retrait de ${fmtMoney(amount)} effectué`, 'ok');
+    document.getElementById('w-amount').value = '';
+    document.getElementById('w-desc').value = '';
+    await loadAccounts();
+  } else {
+    feedback('fb-withdraw', result.data.message, 'err');
+  }
+});
+
+// ── TRANSFERT ──
+document.getElementById('btn-transfer').addEventListener('click', async () => {
+  clearFeedback('fb-transfer');
+  if (!currentAccountId) { feedback('fb-transfer', 'Sélectionne un compte d\\'abord.', 'err'); return; }
+
+  const toAccountId = document.getElementById('t-dest').value;
+  const amount = parseFloat(document.getElementById('t-amount').value);
+
+  if (!toAccountId) { feedback('fb-transfer', 'Choisis un compte destinataire.', 'err'); return; }
+
+  const btn = document.getElementById('btn-transfer');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Transfert...';
+
+  const result = await apiCall('POST', `/accounts/${currentAccountId}/transfer`, { toAccountId, amount });
+
+  btn.disabled = false;
+  btn.textContent = 'Transférer';
+
+  if (result.ok) {
+    feedback('fb-transfer', `Transfert effectué : nouveau solde ${fmtMoney(result.data.data.from.balance)}`, 'ok');
+    toast(`🔁 Transfert de ${fmtMoney(amount)} envoyé`, 'ok');
+    document.getElementById('t-amount').value = '';
+    await loadAccounts();
+  } else {
+    feedback('fb-transfer', result.data.message, 'err');
+  }
+});
+
+// ── SUPPRESSION ──
+document.getElementById('btn-delete').addEventListener('click', async () => {
+  clearFeedback('fb-delete');
+  if (!currentAccountId) { feedback('fb-delete', 'Sélectionne un compte d\\'abord.', 'err'); return; }
+
+  const btn = document.getElementById('btn-delete');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Suppression...';
+
+  const result = await apiCall('DELETE', `/accounts/${currentAccountId}`);
+
+  btn.disabled = false;
+  btn.textContent = 'Supprimer ce compte';
+
+  if (result.ok) {
+    toast('🗑️ Compte supprimé', 'ok');
+    currentAccountId = null;
+    prevBalance = null;
+    await loadAccounts();
+  } else {
+    feedback('fb-delete', result.data.message, 'err');
+  }
+});
+
+// ── INIT ──
+loadAccounts();
+setInterval(loadAccounts, 15000); // rafraîchit toutes les 15s
+</script>
+</body>
+</html>
